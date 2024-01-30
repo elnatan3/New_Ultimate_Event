@@ -15,9 +15,12 @@
         <button type="submit">Submit</button>
     </form>
 
+    
+
     {% block message %}
         {% if message %}
             <div class="alert">{{ message }}</div>
         {% endif %}
     {% endblock %}
+    
 {% endblock %}

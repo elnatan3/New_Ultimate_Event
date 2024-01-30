@@ -1,0 +1,1 @@
+9999999999{"name": "gax-google-pubsub-v1", "version": "0.8.3", "summary": "DEPRECATED", "platform": "UNKNOWN", "requires_dist": ["googleapis-common-protos>=1.1.0", "google-gax>=0.12.5, <0.13.0", "grpc-google-pubsub-v1>=0.8.1, <0.9.0", "oauth2client>=1.4.11"], "requires_python": null, "files": [], "_cache_version": "1.0.0"}

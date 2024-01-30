@@ -1,0 +1,1 @@
+9999999999{"name": "python-jwt", "version": "2.0.1", "summary": "Module for generating and verifying JSON Web Tokens", "platform": "", "requires_dist": ["jws (>=0.1.3)"], "requires_python": "", "files": [], "_cache_version": "1.0.0"}

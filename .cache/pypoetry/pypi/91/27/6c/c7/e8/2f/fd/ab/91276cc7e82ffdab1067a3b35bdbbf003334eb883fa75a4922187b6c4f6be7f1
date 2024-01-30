@@ -1,0 +1,1 @@
+9999999999{"name": "requests", "version": "2.11.1", "summary": "Python HTTP for Humans.", "platform": "UNKNOWN", "requires_dist": ["ndg-httpsclient; extra == 'security'", "pyOpenSSL (>=0.13); extra == 'security'", "pyasn1; extra == 'security'", "PySocks (>=1.5.6); extra == 'socks'"], "requires_python": null, "files": [], "_cache_version": "1.0.0"}

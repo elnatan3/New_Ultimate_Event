@@ -48,3 +48,5 @@ CREATE TABLE UserEvent (
     FOREIGN KEY (EventID) REFERENCES Events (EventID)
 );
 
+ALTER TABLE Users ADD COLUMN EmailDomain TEXT;
+ALTER TABLE Organizers ADD COLUMN EmailDomain TEXT;

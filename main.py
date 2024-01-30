@@ -1,6 +1,7 @@
 import sqlite3
 from flask import Flask, render_template, request, url_for, flash, redirect, abort, jsonify, session
 from datetime import datetime
+import pyrebase
 # ...
 
 # Create a flask app
@@ -9,6 +10,22 @@ app.config['SECRET_KEY'] = 'your secret key'
 
 app.static_folder = 'static'
 app.static_url_path = '/static'
+
+# Firebase Configuration
+config = {
+  "apiKey": "AIzaSyB_idEt5ShUCgrDIvG8I5LqoB91w-rRdm8",
+  "authDomain": "ultimate-ad427.firebaseapp.com",
+  "projectId": "ultimate-ad427",
+  "storageBucket": "ultimate-ad427.appspot.com",
+  "messagingSenderId": "344399457714",
+  "appId": "1:344399457714:web:02187d4dba9367d436c8ab",
+  "measurementId": "G-RQKSY235B3",
+  "databaseURL": "https//ultimate-ad427.firebaseapp.com"
+}
+# https://ultimate-ad427.firebaseio.com
+
+firebase = pyrebase.initialize_app(config)
+auth = firebase.auth()
 
 
 def get_db_connection():
@@ -48,65 +65,122 @@ def existing_user():
   return render_template('existing_user.html')
 
 
-@app.route('/create_user', methods=['POST'])
+def extract_email_domain(email):
+  return email.split('@')[-1]
+
+
+@app.route('/create_user', methods=['GET', 'POST'])
 def create_user():
-  username = request.form['username']
-  password = request.form['password']
-  email = request.form['email']
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
 
-  conn = get_db_connection()
+        if len(password) < 6:
+            flash('Password should be at least 6 characters long.', 'error')
+            return redirect(url_for('create_user'))
 
-  # Check if the username is already in use
-  user = conn.execute('SELECT * FROM Users WHERE username = ?',
-                      (username, )).fetchone()
-  if user is not None:
-    message = 'That username is already taken.'
-    conn.close()
-    return render_template('existing_user.html', message=message)
+    
+        email_domain = extract_email_domain(email)
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM Users WHERE username = ? OR email = ?', (username, email)).fetchone()
+        organizer = conn.execute('SELECT * FROM Organizers WHERE name = ? OR email = ?', (username, email)).fetchone()
 
-  # Insert the new user into the User table
-  conn.execute(
-    'INSERT INTO Users (username, password, email) VALUES (?, ?, ?)',
-    (username, password, email))
-  conn.commit()
+        if user or organizer:
+            flash('That username or email is already taken.', 'error')
+            conn.close()
+            return redirect(url_for('create_user'))
 
-  # Log the user in automatically
-  user = conn.execute(
-    'SELECT * FROM Users WHERE username = ? AND password = ?',
-    (username, password)).fetchone()
-  session['user_id'] = user['UserID']
+        try:
+            firebase_user = auth.create_user_with_email_and_password(email, password)
+            auth.send_email_verification(firebase_user['idToken'])
+            # auth.create_user_with_email_and_password(email, password)
+            # auth.sign_in_with_email_and_password(email,password)
+            flash('Account created successfully. Please verify your email.', 'success')
+        except Exception as e:
+            flash(f'Failed to create account: {str(e)}', 'error')
+        # Insert the new user into the User table
+        conn.execute('INSERT INTO Users (username, email, EmailDomain) VALUES (?, ?, ?)',
+                         (username, email, email_domain))     
+        conn.commit()
+        conn.close()
+        return redirect(url_for('existing_user'))
 
-  conn.close()
-
-  return redirect(url_for('index'))
+    return render_template('create_user.html')
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-  username = request.form['username']
-  password = request.form['password']
-  conn = get_db_connection()
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
 
-  user = conn.execute(
-    'SELECT * FROM Users WHERE username = ? AND password = ?',
-    (username, password)).fetchone()
+        try:
+            # Authenticate with Firebase
+            firebase_user = auth.sign_in_with_email_and_password(email, password)
 
-  if user is None:
-    message = 'Invalid username or password.'
-    conn.close()
-    return render_template('existing_user.html', message=message)
+            # Get Firebase user data to check email verification status
+            user_data = auth.get_account_info(firebase_user['idToken'])
+            email_verified = user_data['users'][0]['emailVerified']
 
-  # Create a session variable to store the user's UserID
-  session['user_id'] = user['UserID']
+            if not email_verified:
+                flash('Your email address has not been verified.', 'error')
+                return redirect(url_for('existing_user'))
 
-  conn.close()
-  return redirect(url_for('events'))
+            # Set user session or additional login logic
+            conn = get_db_connection()
+            user = conn.execute('SELECT * FROM Users WHERE email = ?', (email,)).fetchone()
+
+            if user is None:
+                flash('User not found.', 'error')
+                conn.close()
+                return redirect(url_for('existing_user'))
+
+            # Update local database if email is verified in Firebase
+            conn.commit()
+            session['user_id'] = user['UserID']
+            flash('Logged in successfully', 'success')
+            return redirect(url_for('events'))
+
+        except Exception as e:
+            print("Login failed:", e)
+            flash('Login failed. Please check your email and password.', 'error')
+
+    return redirect(url_for('existing_user'))
+
+
 
 
 @app.route('/logout', methods=['POST'])
 def logout():
   session.pop('user_id', None)
   return redirect(url_for('index'))
+
+
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        email = request.form['email']
+
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM Users WHERE email = ?', (email,)).fetchone()
+        organizer = conn.execute('SELECT * FROM Organizers WHERE email = ?', (email,)).fetchone()
+
+        if user or organizer:
+            try:
+                # Send password reset email
+                auth.send_password_reset_email(email)
+                flash('A password reset link has been sent to your email address.', 'success')
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'error')
+        else:
+            flash('Email address not found.', 'error')
+
+        conn.close()
+        return render_template('welcome.html')
+
+    return render_template('reset_password.html')
+
 
 
 # Organizer routes
@@ -118,59 +192,78 @@ def existing_organizer():
 @app.route('/organizer_login', methods=['GET', 'POST'])
 def organizer_login():
   if request.method == 'POST':
-    email = request.form['email']
-    password = request.form['password']
-    conn = get_db_connection()
+        email = request.form['email']
+        password = request.form['password']
 
-    organizer = conn.execute(
-      'SELECT * FROM Organizers WHERE email = ? AND password = ?',
-      (email, password)).fetchone()
+        try:
+            # Authenticate with Firebase
+            firebase_user = auth.sign_in_with_email_and_password(email, password)
 
-    if organizer is None:
-      message = 'Invalid email or password.'
-      conn.close()
-      return render_template('organizer_login.html', message=message)
+            # Get Firebase user data to check email verification status
+            user_data = auth.get_account_info(firebase_user['idToken'])
+            email_verified = user_data['users'][0]['emailVerified']
 
-    session['organizer_id'] = organizer['OrganizerID']
-    conn.close()
+            if not email_verified:
+                flash('Your email address has not been verified.', 'error')
+                return redirect(url_for('existing_organizer'))
+            # Set user session or additional login logic
+            conn = get_db_connection()
+            organizer = conn.execute('SELECT * FROM Organizers WHERE email = ?', (email,)).fetchone()
 
-    return redirect(url_for('organizer'))
-  else:
-    return render_template('organizer_login.html')
+            if organizer is None:
+                flash('Organizer not found.', 'error')
+                conn.close()
+                return redirect(url_for('existing_organizer'))
+
+            # Update local database if email is verified in Firebase
+            conn.commit()
+            session['organizer_id'] = organizer['OrganizerID']
+            flash('Logged in successfully', 'success')
+            return redirect(url_for('organizer'))
+
+        except Exception as e:
+            print("Login failed:", e)
+            flash('Login failed. Please check your email and password.', 'error')
+  return redirect(url_for('existing_organizer'))
 
 
 @app.route('/organizer_login/create_organizer', methods=['POST'])
 def create_organizer():
-  name = request.form['name']
-  description = request.form['description']
-  email = request.form['email']
-  password = request.form['password']
+  if request.method == 'POST':
+        name = request.form['name']
+        description = request.form['description']
+        email = request.form['email']
+        password = request.form['password']
 
-  conn = get_db_connection()
+        if len(password) < 6:
+            flash('Password should be at least 6 characters long.', 'error')
+            return redirect(url_for('create_organizer'))
 
-  # Check if the email is already in use
-  organizer = conn.execute('SELECT * FROM Organizers WHERE email = ?',
-                           (email, )).fetchone()
-  if organizer is not None:
-    message = 'An account with that email already exists.'
-    conn.close()
-    return render_template('organizer_login.html', message=message)
+    
+        email_domain = extract_email_domain(email)
+        conn = get_db_connection()
+        organizer = conn.execute('SELECT * FROM Organizers WHERE name = ? OR email = ?', (name, email)).fetchone()
+        user = conn.execute('SELECT * FROM Users WHERE username = ? OR email = ?', (name, email)).fetchone()
+        if organizer or user:
+            flash('That username or email is already taken.', 'error')
+            conn.close()
+            return redirect(url_for('create_organizer'))
 
-  # Insert the new organizer into the Organizers table
-  conn.execute(
-    'INSERT INTO Organizers (name, description, email, password) VALUES (?, ?, ?, ?)',
-    (name, description, email, password))
-  conn.commit()
+        try:
+            firebase_user = auth.create_user_with_email_and_password(email, password)
+            auth.send_email_verification(firebase_user['idToken'])
+            # auth.create_user_with_email_and_password(email, password)
+            # auth.sign_in_with_email_and_password(email,password)
+            flash('Account created successfully. Please verify your email.', 'success')
+        except Exception as e:
+            flash(f'Failed to create account: {str(e)}', 'error')
+        # Insert the new user into the User table
+        conn.execute('INSERT INTO Organizers (name, description, email, password, EmailDomain) VALUES (?, ?, ?, ?, ?)',(name, description, email, password, email_domain))     
+        conn.commit()
+        conn.close()
+        return redirect(url_for('existing_organizer'))
 
-  # Log the organizer in automatically
-  organizer = conn.execute(
-    'SELECT * FROM Organizers WHERE email = ? AND password = ?',
-    (email, password)).fetchone()
-  session['organizer_id'] = organizer['OrganizerID']
-
-  conn.close()
-
-  return redirect(url_for('index'))
+  return render_template('create_organizer.html')
 
 
 @app.route('/organizer_logout', methods=['POST'])
@@ -179,22 +272,30 @@ def organizer_logout():
   return redirect(url_for('index'))
 
 
-# Event routes
 @app.route('/events', methods=['GET'])
 def events():
-  if 'user_id' not in session:
-    return redirect(url_for('existing_user'))
+    if 'user_id' not in session:
+        return redirect(url_for('existing_user'))
 
-  conn = get_db_connection()
+    conn = get_db_connection()
+    current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-  # Get the current date and time
-  current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    # Get the user's email domain
+    user_id = session['user_id']
+    user = conn.execute('SELECT * FROM Users WHERE UserID = ?', (user_id,)).fetchone()
+    user_email_domain = user['EmailDomain']
 
-  # Fetch events that are past today's date and time
-  events = conn.execute('SELECT * FROM Events WHERE EventDateTime >= ?',
-                        (current_datetime, )).fetchall()
-  conn.close()
-  return render_template('events.html', events=events)
+    # Fetch events where the organizer's email domain matches the user's email domain
+    events = conn.execute('''
+        SELECT e.* FROM Events e
+        INNER JOIN OrganizerEvent oe ON e.EventID = oe.EventID
+        INNER JOIN Organizers o ON oe.OrganizerID = o.OrganizerID
+        WHERE e.EventDateTime >= ? AND o.EmailDomain = ?
+        ''', (current_datetime, user_email_domain)).fetchall()
+
+    conn.close()
+    return render_template('events.html', events=events)
+
 
 
 @app.route('/upcoming_events')

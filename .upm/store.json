@@ -1,0 +1,1 @@
+{"version":2,"languages":{"nodejs-npm":{"specfileHash":"2a382eadcac9b66642172c30f90ac1ea","lockfileHash":"4a95eb1b842cd0ed3fe7912dea849d92"},"python-python3-poetry":{"specfileHash":"cb865081e9e839ddc497dd27f04f0a36","lockfileHash":"07e9b7e9574c38859b0d166ed15b935d","guessedImports":["Flask","Pyrebase"],"guessedImportsHash":"0daaa9c6df61cd896b97eafeef613419"}}}
