@@ -1,0 +1,28 @@
+<!-- organizer_profile.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ organizer['Name'] }}</h1>
+    <div class="nav-buttons">
+        <a href="{{ url_for('organizer_profile') }}" class="nav-button active">Profile</a>
+        <a href="{{ url_for('create_event') }}" class="nav-button">Create Event</a>
+        <a href="{{ url_for('upcoming_events_organizer') }}" class="nav-button">Upcoming Events</a>
+        <a href="{{ url_for('previous_events_organizer') }}" class="nav-button">Previous Events</a>
+    </div>
+    <div class="profile">
+      <div class="profile-section">
+          <h3>About</h3>
+          <p>{{ organizer['Description'] }}</p>
+      </div>
+      <div class="profile-section">
+          <h3>Contact Information</h3>
+          <p>Email: {{ organizer['Email'] }}</p>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.profile').css('position', 'relative').css('left', '-100%').animate({left: 0}, 1000);
+        });
+    </script>
+{% endblock %}

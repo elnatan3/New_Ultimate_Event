@@ -1,0 +1,22 @@
+<!-- create_event.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Create Event</h1>
+    <div class="nav-buttons">
+        <a href="{{ url_for('organizer_profile') }}" class="nav-button">Profile</a>
+        <a href="{{ url_for('create_event') }}" class="nav-button active">Create Event</a>
+        <a href="{{ url_for('upcoming_events_organizer') }}" class="nav-button">Upcoming Events</a>
+        <a href="{{ url_for('previous_events_organizer') }}" class="nav-button">Previous Events</a>
+    </div>
+    <form method="POST" action="{{ url_for('create_event') }}" class="create-event-form">
+      <label for="name" class="form-label">Event Name:</label>
+      <input type="text" id="name" name="name" value="{{ data.name if data else '' }}" required class="form-input"><br><br>
+      <label for="description" class="form-label">Description:</label>
+      <textarea id="description" name="description" class="textarea form-input" required>{{ data.description if data else '' }}</textarea><br><br>
+      <label for="event_datetime" class="form-label">Event Date and Time:</label>
+      <input type="datetime-local" id="event_datetime" name="event_datetime" value="{{ data.event_datetime if data else '' }}" required class="form-input"><br><br>
+      <input type="submit" value="Create Event" class="create-event-button">
+    </form>
+
+{% endblock %}

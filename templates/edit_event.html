@@ -1,0 +1,21 @@
+<!-- edit_event.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Edit Event</h1>
+    <div class="nav-buttons">
+        <a href="{{ url_for('organizer_profile') }}" class="nav-button">Profile</a>
+        <a href="{{ url_for('create_event') }}" class="nav-button">Create Event</a>
+        <a href="{{ url_for('upcoming_events_organizer') }}" class="nav-button active">Upcoming Events</a>
+        <a href="{{ url_for('previous_events_organizer') }}" class="nav-button">Previous Events</a>
+    </div>
+    <form method="POST" action="{{ url_for('edit_event', event_id=event['EventID']) }}" class="create-event-form">
+        <label for="name" class="form-label">Event Name:</label>
+        <input type="text" id="name" name="name" value="{{ event['Name'] }}" required class="form-input"><br><br>
+        <label for="description" class="form-label">Description:</label>
+        <textarea id="description" name="description" class="textarea form-input" required>{{ event['Description'] }}</textarea><br><br>
+        <label for="event_datetime" class="form-label">Event Date and Time:</label>
+        <input type="datetime-local" id="event_datetime" name="event_datetime" value="{{ event['EventDateTime'] }}" class="form-input" required ><br><br>
+        <input type="submit" value="Update Event" class="create-event-button">
+    </form>
+{% endblock %}

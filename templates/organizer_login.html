@@ -1,0 +1,22 @@
+{% extends 'base.html' %} {% block content %}
+<h1>Organizer Log In</h1>
+{% if message %}
+<div class="alert">{{ message }}</div>
+{% endif %}
+<form
+  style="margin-left: 100px; margin-right: 100px"
+  method="POST"
+  action="{{ url_for('organizer_login') }}"
+>
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" required />
+  <br />
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" required />
+  <br />
+  <button type="submit">Log In</button>
+</form>
+<p style="margin-left: 100px; margin-right: 100px">
+  Don't have an account? <a href="{{ url_for('new_organizer') }}">Sign Up</a>
+</p>
+{% endblock %}

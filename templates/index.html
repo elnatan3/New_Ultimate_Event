@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title">Welcome to Ultimate Event</h1>
+      <p class="hero-description">The All-in-One Event Portal</p>
+      <a href="{{ url_for('welcome') }}" class="welcome-button">Get Started</a>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="container">
+      <div class="feature">
+        <div class="feature-shape feature-shape1"></div>
+        <h2 class="feature-title">Easy Event Registration</h2>
+        <p class="feature-description">Register for any event created by different organizers hassle-free.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-shape feature-shape2"></div>
+        <h2 class="feature-title">Organizer Attendance Tracking</h2>
+        <p class="feature-description">View who is attending your events and manage attendee information.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-shape feature-shape3"></div>
+        <h2 class="feature-title">Event Tracking</h2>
+        <p class="feature-description">Keep track of all the events you are attending in one platform. Ultimate Event is not just a traditional RSVP platform but a revolutionary event social media.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-shape feature-shape4"></div>
+        <h2 class="feature-title">Building Communities</h2>
+        <p class="feature-description">Ultimate Event is more than just an event tracker. It allows you to look back and feel connected to the community by seeing the events you attended. It's a secure, robust, and limitless platform for events, volunteering activities, fundraising, discussions, and more!</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="container">
+      <h2 class="cta-title">Join Ultimate Event Today!</h2>
+      <p class="cta-description">Experience the simplicity, speed, and user-friendly nature of the ultimate event management platform.</p>
+      <a href="{{ url_for('welcome') }}" class="cta-button">Sign Up Now</a>
+    </div>
+  </section>
+{% endblock %}

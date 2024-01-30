@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}{% endblock %} -Ultimate Event</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles/style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="body-page">
+      <div class="login-logout">
+        {% if session['user_id'] %}
+        <form action="{{ url_for('logout') }}" method="post">
+          <button type="submit" class="logout-button">Log Out</button>
+        </form>
+        {% elif session['organizer_id'] %}
+        <form action="{{ url_for('organizer_logout') }}" method="post">
+          <button type="submit" class="logout-button">Log Out</button>
+        </form>
+        {% else %}
+        <a href="{{ url_for('welcome') }}" class="login-button">Dive In</a>
+        {% endif %}
+      </div>
+      <!-- <div class="home-button-container">
+            <a href="{{ url_for('index') }}" class="home-button">Home</a>
+        </div>  -->
+
+      <div class="content container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert">{{ message }}</div>
+        {% endfor %} {% block content %}{% endblock %}
+      </div>
+    </div>
+    <footer class="footer">
+      <div class="container">
+        <p>&copy; 2023 Ultimate Event. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>

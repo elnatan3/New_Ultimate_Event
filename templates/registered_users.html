@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Registered Users</h1>
+    <ul class="user-list">
+        {% for user in users %}
+            <li>{{ user['Username'] }}</li>
+        {% endfor %}
+    </ul>
+    <form action="{{ url_for('upcoming_events_organizer') }}"><button type="submit">Back to Events</button>
+{% endblock %}

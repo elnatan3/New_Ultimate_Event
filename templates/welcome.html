@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <section class="welcome">
+    <div class="container">
+      <h1 class="welcome-title">Welcome to Ultimate Event</h1>
+      <h2 class="welcome-subtitle">Are you a participant or organizer?</h2>
+      <a href="{{ url_for('existing_user') }}" class="user-button">Participant</a>
+      <a href="{{ url_for('existing_organizer') }}" class="organizer-button">Organizer</a>
+    </div>
+  </section>
+{% endblock %}
