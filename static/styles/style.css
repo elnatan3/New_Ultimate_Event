@@ -464,61 +464,6 @@ a:hover {
 }
 
 
-/* h1 {
-  position: relative;
-  font-size: 48px;
-  font-weight: bold;
-  color: #333;
-  text-transform: uppercase;
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-h1::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, #FFD700, #FFA500, #FFD700);
-  transform: translateX(-50%) translateY(-50%) rotate(45deg);
-  z-index: -1;
-}
-
-h1::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, #FFD700, #FFA500, #FFD700);
-  transform: translateX(-50%) translateY(-50%) rotate(-45deg);
-  z-index: -1;
-  filter: blur(20px);
-}
-
-h1:hover::before,
-h1:hover::after {
-  animation: rotate-gradient 3s infinite;
-}
-
-@keyframes rotate-gradient {
-  0% {
-    transform: translateX(-50%) translateY(-50%) rotate(45deg) scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translateX(-50%) translateY(-50%) rotate(45deg) scale(1.3);
-    opacity: 0.2;
-  }
-  100% {
-    transform: translateX(-50%) translateY(-50%) rotate(45deg) scale(1);
-    opacity: 0.6;
-  }
-}
- */
 
 .welcome-button,
 .user-button,
@@ -876,80 +821,118 @@ h1 {
     color: #007bff;
 }
 
+/* User List Styles */
 .user-list {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
 }
 
 .user-list li {
-    background-color: #fff;
-    margin: 10px 0;
-    padding: 15px 30px;
-    border-radius: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    font-size: 1.2rem;
-    color: #333;
-    position: relative;
-    animation: user-list-animation 0.5s ease-out forwards;
-    transform: translateY(20px);
-    opacity: 0;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.user-list li:hover {
-    background-color: #007bff;
-    color: #fff;
-    transform: translateY(-5px);
+/* Animated Text Style */
+.animated-text {
+  width: 80%;
+  margin: 20px auto;
+  color: #4285F4; /* Gmail Blue */
+  font-size: 20px;
+  text-align: center;
+  overflow: hidden;
+  animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite, pulse 1.5s infinite alternate;
 }
 
-@keyframes user-list-animation {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
 }
 
-button {
-    display: block;
-    width: 200px;
-    margin: 20px auto;
-    padding: 10px;
-    border: none;
-    background-color: #5D93E1;
-    color: #fff;
-    font-size: 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: black; }
 }
 
-button:hover {
-    background-color: #4a79d1;
-    transform: translateY(-3px);
+@keyframes pulse {
+  from {
+      transform: scale(1);
+      opacity: 1;
+  }
+  to {
+      transform: scale(1.05);
+      opacity: .85;
+  }
 }
 
-
-.back-button {
+/* Gmail Button Style */
+.gmail-button {
   display: inline-block;
-  padding: 10px 20px;
-  background-color: #333;
-  color: #fff;
-  text-decoration: none;
+  padding: 12px 25px;
+  background-color: #4285F4; /* Gmail Blue */
+  color: white;
+  border: none;
+  border-radius: 4px;
   font-size: 16px;
-  font-weight: bold;
-  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  margin: 20px auto;
+  display: block;
+  width: 200px; /* Fixed width */
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   transition: background-color 0.3s ease;
 }
 
-.back-button:hover {
+.gmail-button:hover {
+  background-color: #357ae8;
+  text-decoration: none;
+  color: white;
+}
+
+/* Back Button Style */
+.back {
+  text-align: right;
+  margin-top: 20px;
+}
+
+form button {
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
   background-color: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+      width: 95%;
+  }
+
+  .animated-text, .gmail-button {
+      width: 90%;
+      font-size: 14px;
+  }
+
+  h1 {
+      font-size: 24px;
+  }
+
+  form button {
+      padding: 8px 15px;
+      font-size: 14px;
+  }
 }
 
 .edit-remove-buttons{

@@ -33,6 +33,7 @@
                     {{ hour }}:{{ minute }} AM
                   {% endif %}
                 </p>
+                <p>Contact: <a href="mailto:{{ event['OrganizerEmail'] }}">{{ event['OrganizerEmail'] }}</a></p>
             </div>
         {% endfor %}
     {% else %}

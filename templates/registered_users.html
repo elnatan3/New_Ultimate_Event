@@ -7,5 +7,13 @@
             <li>{{ user['Username'] }}</li>
         {% endfor %}
     </ul>
-    <form action="{{ url_for('upcoming_events_organizer') }}"><button type="submit">Back to Events</button>
+
+    <!-- Gmail Link -->
+    <p class="animated-text">Any updates? Send an email to all participants to update them about any announcements.</p>
+    <a class="gmail-button" href="https://mail.google.com/mail/?view=cm&fs=1&to={{ user_emails|join(',') }}&su=Your Subject Here&body=Your Email Body Here" target="_blank">
+        Send Email
+    </a>
+
+
+    <form action="{{ url_for('upcoming_events_organizer') }}"><button type="submit" class = "back">Back to Events</button>
 {% endblock %}

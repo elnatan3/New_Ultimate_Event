@@ -301,19 +301,45 @@ def events():
 
 @app.route('/upcoming_events')
 def upcoming_events():
-  if 'user_id' not in session:
-    return redirect(url_for('existing_user'))
+    if 'user_id' not in session:
+        return redirect(url_for('existing_user'))
 
-  user_id = session['user_id']
+    user_id = session['user_id']
+    conn = get_db_connection()
+    current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-  conn = get_db_connection()
-  current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-  upcoming_events = conn.execute(
-    'SELECT e.* FROM Events e INNER JOIN UserEvent ue ON e.EventID = ue.EventID WHERE ue.UserID = ? AND e.EventDateTime > ?',
-    (user_id, current_datetime)).fetchall()
-  conn.close()
+    upcoming_events = conn.execute('''
+        SELECT e.*, o.email as OrganizerEmail 
+        FROM Events e 
+        INNER JOIN UserEvent ue ON e.EventID = ue.EventID 
+        INNER JOIN OrganizerEvent oe ON e.EventID = oe.EventID
+        INNER JOIN Organizers o ON oe.OrganizerID = o.OrganizerID
+        WHERE ue.UserID = ? AND e.EventDateTime > ?
+        ''', (user_id, current_datetime)).fetchall()
 
-  return render_template('upcoming_events.html', events=upcoming_events)
+    conn.close()
+    return render_template('upcoming_events.html', events=upcoming_events)
+
+@app.route('/previous_events')
+def previous_events():
+    if 'user_id' not in session:
+        return redirect(url_for('existing_user'))
+
+    user_id = session['user_id']
+    conn = get_db_connection()
+    current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    previous_events = conn.execute('''
+        SELECT e.*, o.email as OrganizerEmail 
+        FROM Events e 
+        INNER JOIN UserEvent ue ON e.EventID = ue.EventID 
+        INNER JOIN OrganizerEvent oe ON e.EventID = oe.EventID
+        INNER JOIN Organizers o ON oe.OrganizerID = o.OrganizerID
+        WHERE ue.UserID = ? AND e.EventDateTime < ?
+        ''', (user_id, current_datetime)).fetchall()
+
+    conn.close()
+    return render_template('previous_events.html', events=previous_events)
 
 
 @app.route('/remove_event/<int:event_id>', methods=['POST'])
@@ -344,21 +370,7 @@ def remove_event(event_id):
   return redirect(url_for('upcoming_events'))
 
 
-@app.route('/previous_events')
-def previous_events():
-  if 'user_id' not in session:
-    return redirect(url_for('existing_user'))
 
-  user_id = session['user_id']
-
-  conn = get_db_connection()
-  current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-  previous_events = conn.execute(
-    'SELECT e.* FROM Events e INNER JOIN UserEvent ue ON e.EventID = ue.EventID WHERE ue.UserID = ? AND e.EventDateTime < ?',
-    (user_id, current_datetime)).fetchall()
-  conn.close()
-
-  return render_template('previous_events.html', events=previous_events)
 
 
 @app.route('/events/register/<int:event_id>', methods=['POST'])
@@ -610,19 +622,22 @@ def previous_events_organizer():
                          events=previous_events)
 
 
-@app.route('/organizer/view_registered_users/<event_id>')
+@app.route('/organizer/view_registered_users/<int:event_id>')
 def view_registered_users(event_id):
-  conn = get_db_connection()
-  registered_users = conn.execute(
-    '''
-        SELECT u.Username
+    conn = get_db_connection()
+    registered_users = conn.execute(
+        '''
+        SELECT u.Username, u.email
         FROM Users u
         INNER JOIN UserEvent ue ON u.UserID = ue.UserID
         WHERE ue.EventID = ?
         ''', (event_id, )).fetchall()
-  conn.close()
+    conn.close()
 
-  return render_template('registered_users.html', users=registered_users)
+    # Extract emails
+    user_emails = [user['email'] for user in registered_users]
+
+    return render_template('registered_users.html', users=registered_users, user_emails=user_emails)
 
 
 if __name__ == '__main__':
