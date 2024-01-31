@@ -4,10 +4,10 @@
 
 # Features
 
-1. Verifies email during sign ups for both Organizers and Participant to make sure the person its not a fake email
-2. Only shows events to those participant who have the same email domain. For example, an organizer in Augustana college with @augustana.edu will only show events to augustana students who have verified their emails.
-3. Users can register for events, remove events, and see the events they have attended.
-4. Organizers can see who registerd for their event, create a new event, see the upcoming events they have created, and finally see any previous events they have created.
+1. Email Verification: Implements a robust email verification process during registration for both Organizers and Participants. This ensures the authenticity of users and prevents the creation of accounts with fraudulent email addresses.
+2. Domain-Specific Event Visibility: Facilitates a domain-restricted visibility of events. For instance, an Organizer affiliated with Augustana College (using an @augustana.edu email) will have their events exclusively visible to participants with verified Augustana College email addresses. This feature ensures a targeted and relevant audience for each event.
+3. User Interaction with Events: Allows users to actively engage with event listings. Participants have the capability to register for events, withdraw from events, and view a history of events they have attended, enhancing user engagement and experience.
+4. Organizer Management Tools: Provides Organizers with comprehensive management tools for their events. Organizers can monitor registrations, create new events, view upcoming and past events they have organized. This suite of tools aids in efficient event management and tracking.
 
 Here is how the website home page looks:
 
