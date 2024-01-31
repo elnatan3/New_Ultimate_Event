@@ -96,9 +96,9 @@ def create_user():
             auth.send_email_verification(firebase_user['idToken'])
             # auth.create_user_with_email_and_password(email, password)
             # auth.sign_in_with_email_and_password(email,password)
-            flash('Account created successfully. Please verify your email.', 'success')
+            flash('Account created successfully. Please check your email and verify.', 'success')
         except Exception as e:
-            flash(f'Failed to create account: {str(e)}', 'error')
+            flash(f'Failed to create account:', 'error')
         # Insert the new user into the User table
         conn.execute('INSERT INTO Users (username, email, EmailDomain) VALUES (?, ?, ?)',
                          (username, email, email_domain))     
@@ -286,8 +286,9 @@ def events():
     user_email_domain = user['EmailDomain']
 
     # Fetch events where the organizer's email domain matches the user's email domain
+    # Updated query to fetch organizer's email
     events = conn.execute('''
-        SELECT e.* FROM Events e
+        SELECT e.*, o.email as OrganizerEmail FROM Events e
         INNER JOIN OrganizerEvent oe ON e.EventID = oe.EventID
         INNER JOIN Organizers o ON oe.OrganizerID = o.OrganizerID
         WHERE e.EventDateTime >= ? AND o.EmailDomain = ?
