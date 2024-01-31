@@ -16,10 +16,13 @@
   <br />
   <button type="submit">Log In</button>
 </form>
-<p style="margin-left: 100px; margin-right: 100px">
-  Don't have an account? <a href="{{ url_for('new_organizer') }}">Sign Up</a>
+<p style="margin-left: 100px; margin-right: 100px;">
+  Don't have an account? 
+  <span class="button-style"><a href="{{ url_for('new_user') }}">Sign Up</a></span>
 </p>
 <p style="margin-left: 100px; margin-right: 100px;">
-  Forgot your password? <a href="{{ url_for('reset_password') }}">click here</a>
+  Forgot your password? 
+  <span class="button-style"><a href="{{ url_for('reset_password') }}">Click here</a></span>
 </p>
+
 {% endblock %}
