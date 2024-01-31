@@ -25,7 +25,12 @@
       AM {% endif %}
     </p>
 
-    <p>Contact: <a href="mailto:{{ event['OrganizerEmail'] }}">{{ event['OrganizerEmail'] }}</a></p>
+    <p>Contact: 
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ event['OrganizerEmail'] }}&su=Subject&body=Your%20Message" target="_blank">
+          {{ event['OrganizerEmail'] }}
+      </a>
+    </p>
+  
 
     <form
       action="{{ url_for('register_event', event_id=event['EventID']) }}"
